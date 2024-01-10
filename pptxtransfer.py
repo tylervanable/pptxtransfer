@@ -7,7 +7,7 @@ from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 def print_instructions():
     print("Instructions for using pptxtransfer.py:")
     print("- Ensure all dependencies (python-pptx, gTTS, moviepy) are installed.")
-    print("- Run the script and follow the prompts to input the PowerPoint file path.")
+    print("- Run the script with python pptxtransfer.py (or python3 pptxtransfer.py). Follow the prompts to input the PowerPoint file path.")
     print("- The script will convert the PowerPoint into a video and save it to the specified output path.")
 
 def check_dependencies():
