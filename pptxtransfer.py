@@ -10,13 +10,42 @@ from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def print_instructions():
-    # [Existing code unchanged]
+    print("Instructions for using pptxtransfer.py:")
+    print("- Ensure all dependencies (python-pptx, gTTS, moviepy) are installed.")
+    print("- Run the script with python pptxtransfer.py (or python3 pptxtransfer.py). Follow the prompts to input the PowerPoint file path.")
+    print("- The script will convert the PowerPoint into a video and save it to the specified output path.")
 
 def check_dependencies():
-    # [Existing code unchanged]
+    dependencies = {
+        "pptx": "python-pptx",
+        "gtts": "gTTS",
+        "moviepy": "moviepy"
+    }
+
+    missing_dependencies = []
+
+    for import_name, package_name in dependencies.items():
+        try:
+            __import__(import_name)
+        except ImportError:
+            missing_dependencies.append(package_name)
+
+    if missing_dependencies:
+        print("The following dependencies are missing:")
+        for dep in missing_dependencies:
+            print(f"- {dep}")
+        print("\nPlease install them using the following command:")
+        print(f"pip install {' '.join(missing_dependencies)}")
+        return False
+    return True
 
 def validate_file_path(file_path, expected_extension, check_exists=True):
-    # [Existing code unchanged]
+ #  Validates if the file path exists and has the expected extension.
+    if check_exists and not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    if not file_path.endswith(expected_extension):
+        raise ValueError(f"The file {file_path} does not have the expected {expected_extension} extension.")
+    return True
 
 def pptx_to_video(pptx_path, output_path):
     # Validate file paths
