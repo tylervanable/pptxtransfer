@@ -91,6 +91,12 @@ def pptx_to_video(pptx_path, output_path):
     # Load the PowerPoint presentation
     presentation = pptx.Presentation(pptx_path)
 
+     # Check for slides with speaker notes
+    has_speaker_notes = check_for_speaker_notes(presentation)
+    skip_slides, slide_duration = (False, 5)  # Default values
+    if not has_speaker_notes:
+        skip_slides, slide_duration = get_user_input_for_skipping_slides()
+    
     # Lists to store temporary files
     temp_audio_files = []
     temp_image_files = []
