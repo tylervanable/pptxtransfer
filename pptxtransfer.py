@@ -34,7 +34,24 @@ def check_dependencies():
         return False
     return True
 
+def validate_file_path(file_path, expected_extension, check_exists=True):
+    """
+    Validates if the file path exists and has the expected extension.
+    """
+    if check_exists and not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    if not file_path.endswith(expected_extension):
+        raise ValueError(f"The file {file_path} does not have the expected {expected_extension} extension.")
+    return True
+
 def pptx_to_video(pptx_path, output_path):
+    # Validate file paths
+    try:
+        validate_file_path(pptx_path, '.pptx')
+        validate_file_path(output_path, '.mp4', check_exists=False)
+    except (FileNotFoundError, ValueError) as e:
+        sys.exit(f"Error: {e}")
+
     # Check if all dependencies are installed
     if not check_dependencies():
         sys.exit("Missing dependencies. Please install them and try again.")
@@ -46,17 +63,18 @@ def pptx_to_video(pptx_path, output_path):
     audio_files = []
     image_files = []
 
-    for i, slide in enumerate(presentation.slides):
-        # Extracting speaker notes
-        notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ''
-        if notes:
-            # Converting notes to speech
-            tts = gTTS(notes)
-            audio_filename = f'temp_audio_{i}.mp3'
-            tts.save(audio_filename)
-            audio_files.append(audio_filename)
+    try:
+        for i, slide in enumerate(presentation.slides):
+            # Extracting speaker notes
+            notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ''
+            if notes:
+                # Converting notes to speech
+                tts = gTTS(notes)
+                audio_filename = f'temp_audio_{i}.mp3'
+                tts.save(audio_filename)
+                audio_files.append(audio_filename)
 
-        # Exporting slide as an image
+            # Exporting slide as an image
         image_filename = f'temp_image_{i}.png'
         slide_image = slide.shapes._spTree
         slide_image.getparent().remove(slide_image)
@@ -84,11 +102,10 @@ def pptx_to_video(pptx_path, output_path):
     final_clip = concatenate_videoclips(video_clips)
     final_clip.write_videofile(output_path, fps=24)
 
+finally:
     # Clean up temporary files
     for filename in audio_files + image_files:
-        os.remove(filename)
+        if os.path.exists(filename):
+            os.remove(filename)
 
-    return output_path
-
-# Example usage
-pptx_to_video('example.pptx', 'output_video.mp4')
+return output_path
