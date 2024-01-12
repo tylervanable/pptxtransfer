@@ -58,6 +58,21 @@ def export_slide_as_image(slide, slide_index, presentation):
         # Save the current slide as an image
         presentation.save(image_file.name)
         return image_file.name
+# Checks for Speaker Notes
+def check_for_speaker_notes(presentation):
+    """ Check if any slide has speaker notes """
+    for slide in presentation.slides:
+        if slide.notes_slide and slide.notes_slide.notes_text_frame.text:
+            return True
+    return False
+
+# User Input for Skipping Slides Option
+def get_user_input_for_skipping_slides():
+    user_input = input("No slides with speaker notes found. Do you want to display all slides for a specified duration? (yes/no): ").strip().lower()
+    if user_input == "yes":
+        slide_duration = int(input("Enter the number of seconds to display each slide: "))
+        return False, slide_duration
+    return True, 0
 
 def pptx_to_video(pptx_path, output_path):
     # Validate file paths
