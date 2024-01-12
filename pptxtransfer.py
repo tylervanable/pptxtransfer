@@ -47,6 +47,18 @@ def validate_file_path(file_path, expected_extension, check_exists=True):
         raise ValueError(f"The file {file_path} does not have the expected {expected_extension} extension.")
     return True
 
+def export_slide_as_image(slide, slide_index, presentation):
+    """
+    Exports a single PowerPoint slide as an image.
+    """
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as image_file:
+        # Remove previous shapes to prevent duplication
+        slide_image = slide.shapes._spTree
+        slide_image.getparent().remove(slide_image)
+        # Save the current slide as an image
+        presentation.save(image_file.name)
+        return image_file.name
+
 def pptx_to_video(pptx_path, output_path):
     # Validate file paths
     try:
@@ -78,11 +90,9 @@ def pptx_to_video(pptx_path, output_path):
                     tts.save(audio_file.name)
                     temp_audio_files.append(audio_file.name)
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as image_file:
-                slide_image = slide.shapes._spTree
-                slide_image.getparent().remove(slide_image)
-                presentation.save(image_file.name)
-                temp_image_files.append(image_file.name)
+            # Exporting slide as an image
+            image_file_name = export_slide_as_image(slide, i, presentation)
+            temp_image_files.append(image_file_name)
         except Exception as e:
             logging.error(f"Error processing slide {i}: {e}")
 
