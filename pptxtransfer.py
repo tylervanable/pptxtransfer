@@ -70,7 +70,12 @@ def check_for_speaker_notes(presentation):
 def get_user_input_for_skipping_slides():
     user_input = input("No slides with speaker notes found. Do you want to display all slides for a specified duration? (yes/no): ").strip().lower()
     if user_input == "yes":
-        slide_duration = int(input("Enter the number of seconds to display each slide: "))
+        while True:
+            try:
+                slide_duration = int(input("Enter the number of seconds to display each slide: "))
+                break  # Exit loop if input is a valid integer
+            except ValueError:
+                print("Please enter a valid integer for the number of seconds.")
         return False, slide_duration
     return True, 0
 
