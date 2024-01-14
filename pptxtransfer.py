@@ -59,11 +59,6 @@ def export_slide_as_image(slide, presentation):
         img.save(image_file.name)  # Save image to temporary file
         return image_file.name
 
-        # Save the slide image
-        img.save(image_file.name)
-
-        return image_file.name
-
 def check_for_speaker_notes(presentation):
     # Check if any slide in the presentation has speaker notes
     for slide in presentation.slides:
@@ -107,20 +102,19 @@ def pptx_to_video(pptx_path, output_path):
     
     temp_audio_files, temp_image_files = []     # Lists to store temporary file paths
 
-    # Process each slide in the presentation
-    for i, slide in enumerate(presentation.slides):
-        try:
-            # Convert speaker notes to audio and export slides as images
-            notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ''
-            if notes:
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as audio_file:
-                    gTTS(notes).save(audio_file.name)  # Convert notes to speech
-                    temp_audio_files.append(audio_file.name)
-            image_file_name = export_slide_as_image(slide, presentation)
-            temp_image_files.append(image_file_name)
-        except Exception as e:
-            logging.error(f"Error processing slide {i}: {e}")
-
+# Process each slide in the presentation
+for i, slide in enumerate(presentation.slides):
+    try:
+        # Convert speaker notes to audio and export slides as images
+        notes = slide.notes_slide.notes_text_frame.text if slide.has_notes_slide else ''
+        if notes:
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as audio_file:
+                gTTS(notes).save(audio_file.name)  # Convert notes to speech
+                temp_audio_files.append(audio_file.name)
+        image_file_name = export_slide_as_image(slide, presentation)
+        temp_image_files.append(image_file_name)
+    except Exception as e:
+        logging.error(f"Error processing slide {i}: {e}")
 
     # Create video clips from slides and corresponding audio
     logging.info("Creating video clips from slides.")
