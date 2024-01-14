@@ -3,6 +3,7 @@ import sys
 import pptx
 import logging
 import tempfile
+from pptx.util import Inches
 from gtts import gTTS
 from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 
@@ -47,17 +48,22 @@ def validate_file_path(file_path, expected_extension, check_exists=True):
         raise ValueError(f"The file {file_path} does not have the expected {expected_extension} extension.")
     return True
 
-def export_slide_as_image(slide, slide_index, presentation):
+
+def export_slide_as_image(slide, presentation):
     """
     Exports a single PowerPoint slide as an image.
     """
     with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as image_file:
-        # Remove previous shapes to prevent duplication
-        slide_image = slide.shapes._spTree
-        slide_image.getparent().remove(slide_image)
-        # Save the current slide as an image
-        presentation.save(image_file.name)
+        # Set slide dimensions for export
+        width, height = presentation.slide_width, presentation.slide_height
+        # Set the slide layout for image export
+        img = slide.get_image(width, height)
+
+        # Save the slide image
+        img.save(image_file.name)
+
         return image_file.name
+
 # Checks for Speaker Notes
 def check_for_speaker_notes(presentation):
     """ Check if any slide has speaker notes """
